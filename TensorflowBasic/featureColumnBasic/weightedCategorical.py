@@ -17,3 +17,15 @@ with tf.Session() as session:
     session.run(tf.global_variables_initializer())
     session.run(tf.tables_initializer())
     print(session.run([tensor]))
+
+"""
+['R'], ['A'], ['G'], ['B'],['R']
+[1.0], [5.0], [4.0], [8.0],[3.0]
+
+[array([[1., 0., 0., 0.],
+       [0., 0., 0., 5.],
+       [0., 4., 0., 0.],
+       [0., 0., 8., 0.],
+       [3., 0., 0., 0.]], dtype=float32)]
+
+"""

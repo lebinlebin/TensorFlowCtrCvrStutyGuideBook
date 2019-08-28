@@ -10,21 +10,11 @@ color和weight就是两个key，在加工tfrecord时候，不用改变数据
 features = {'color': [["410387","415955","412596","416526","416805","408844","418514","411611","415266"], ["410387","415955","412596","416526","416805","408844","418514","411611","415266"]],
                   'weight': [ [44.0,33.0,17.0,6.0,3.0,2.0,1.0,1.0,1.0], [44.0,33.0,17.0,6.0,3.0,2.0,1.0,1.0,1.0] ]  }
 
-# color_f_c = tf.feature_column.categorical_column_with_vocabulary_list(
-#     'color', ['R', 'G', 'B','A'], dtype=tf.string, default_value=-1
-# )
-
 color_f_c = tf.feature_column.categorical_column_with_hash_bucket(
         key='color',
         hash_bucket_size=40,
         dtype=tf.string
     )
-# indicator = tf.feature_column.indicator_column(column)
-# tensorOnlyOne = tf.feature_column.input_layer(colors, [indicator])
-# tensorList = tf.feature_column.input_layer(colors2, [indicator])
-
-
-
 column = tf.feature_column.weighted_categorical_column(color_f_c, 'weight')
 
 indicator = tf.feature_column.indicator_column(column)

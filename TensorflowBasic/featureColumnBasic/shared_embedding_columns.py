@@ -1,7 +1,3 @@
-import numpy as np
-import tensorflow as tf
-import matplotlib.pyplot as plt
-import json
 import tensorflow as tf
 from tensorflow import feature_column
 from tensorflow.python.feature_column.feature_column import _LazyBuilder
@@ -27,7 +23,7 @@ tf.feature_column.shared_embedding_columns(
 """
 
 
-def test_shared_embedding_column_with_hash_bucket():
+def shared_embedding_column_with_hash_bucket():
     color_data = {'color': [[2, 2], [5, 5], [0, -1], [0, 0]],  # 4行样本 shape=[4,2]
                   'color2': [[2], [5], [-1], [0]]}  # 4行样本  shape=[4,1]
     builder = _LazyBuilder(color_data)
@@ -67,7 +63,7 @@ def test_shared_embedding_column_with_hash_bucket():
         print(session.run(color_dense_tensor))
 
 
-test_shared_embedding_column_with_hash_bucket()
+shared_embedding_column_with_hash_bucket()
 """
 需要注意的是，tf.feature_column.shared_embedding_columns的返回值是一个与参数categorical_columns维数相同的列表。
 """

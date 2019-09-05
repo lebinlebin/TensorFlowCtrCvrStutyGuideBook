@@ -26,11 +26,11 @@ my_model(
 def my_model_fn(features,labels,mode,params):
     #输入层,feature_columns对应Classifier(feature_columns=...)
     net = tf.feature_column.input_layer(features, params['feature_columns'])
-    with tf.Session() as session:
-        session.run(tf.global_variables_initializer())
-        session.run(tf.tables_initializer())
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@数据输入到模型中的格式@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-        print(session.run(net))
+    # with tf.Session() as session:
+    #     session.run(tf.global_variables_initializer())
+    #     session.run(tf.tables_initializer())
+    #     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@数据输入到模型中的格式@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    #     print(session.run(net))
     #隐藏层,hidden_units对应Classifier(unit=[10,10])，2个各含10节点的隐藏层
     for units in params['hidden_units']:
         net = tf.layers.dense(net, units=units, activation=tf.nn.relu)
@@ -64,8 +64,8 @@ def my_model_fn(features,labels,mode,params):
             'logits': logits,#[-1.3,2.6,-0.9]
         }
         return tf.estimator.EstimatorSpec(mode, predictions=predictions)
-     
-     
+
+
     #损失函数
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
     
@@ -81,8 +81,8 @@ def my_model_fn(features,labels,mode,params):
                                    name='acc_op') #计算精度
     metrics = {'accuracy': accuracy} #返回格式
     tf.summary.scalar('accuracy', accuracy[1]) #仅为了后面图表统计使用
-    if mode == tf.estimator.ModeKeys.EVAL:
-        return tf.estimator.EstimatorSpec(mode, loss=loss, eval_metric_ops=metrics) 
+
+
       
     
 import os

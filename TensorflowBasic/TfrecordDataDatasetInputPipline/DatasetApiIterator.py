@@ -1,5 +1,7 @@
 import tensorflow as tf
-
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # 设置当前使用的GPU设备仅为0号设备  设备名称为'/gpu:0'
 """
 用tf.data.dataset构建input pipline 文档对应代码
 """
@@ -17,9 +19,9 @@ Dataset可以看作是相同类型“元素”的有序列表。在实际使用�
 TensorFlow的tf.random_uniform()函数的用法
 tf.random_uniform((6, 6), minval=low,maxval=high,dtype=tf.float32)))返回6*6的矩阵，产生于low和high之间，产生的值是均匀分布的。
 """
-import tensorflow as tf
-with tf.Session() as sess:
-    print(sess.run(tf.random_uniform((6,6), minval=-0.5,maxval=0.5, dtype=tf.float32)))
+# import tensorflow as tf
+# with tf.Session() as sess:
+#     print(sess.run(tf.random_uniform((6,6), minval=-0.5,maxval=0.5, dtype=tf.float32)))
 
 
 """
@@ -71,7 +73,10 @@ dataset2 = dataset2.flat_map(lambda x, y: ...)
 dataset3 = dataset3.filter(lambda x, (y, z): ...)
 """
 
+
+
 """
+#############################################################################################################
 创建一个iterator
 一旦你已经构建了一个Dataset来表示你的输入数据，下一步是创建一个Iterator来访问dataset的elements。
 Dataset API当前支持四种iterator，复杂度依次递增：
@@ -86,39 +91,49 @@ one-shot iterator是最简单的iterator，它只支持在一个dataset上迭代
 不需要显式初始化。One-shot iterators可以处理几乎所有的己存在的基于队列的input pipeline支持的情况，
 但它们不支持参数化（parameterization）。使用Dataset.range()示例如下：
 """
-print(">>>>>>>>>>>>>>>>>>>>>>>>case1: one-shot iterator<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-dataset = tf.data.Dataset.range(100)
-iterator = dataset.make_one_shot_iterator()
-next_element = iterator.get_next()
+# print(">>>>>>>>>>>>>>>>>>>>>>>>case1: one-shot iterator<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+# dataset = tf.data.Dataset.range(100)
+# iterator = dataset.make_one_shot_iterator()
+# next_element = iterator.get_next()
+#
+#
+# with tf.Session() as sess:
+#     for i in range(100):
+#       value = sess.run(next_element)
+#       assert i == value
+#       print(i,value)
 
-for i in range(100):
-  value = sess.run(next_element)
-  print(i,value)
-  assert i == value
 
 """
 case2: initializable iterator
 initializable iterator在使用它之前需要你返回一个显式的iterator.initializer操作。
 虽然有些不便，但它允许你可以对dataset的定义进行参数化（parameterize），
-使用一或多个tf.placeholder() 
+使用一或多个tf.placeholder()
 tensors：它们可以当你初始化iterator时被feed进去。继续Dataset.range() 的示例：
 """
-max_value = tf.placeholder(tf.int64, shape=[])
-dataset = tf.data.Dataset.range(max_value)
-iterator = dataset.make_initializable_iterator()
-next_element = iterator.get_next()
+# max_value = tf.placeholder(tf.int64, shape=[])
+# dataset = tf.data.Dataset.range(max_value)
+# iterator = dataset.make_initializable_iterator()
+# next_element = iterator.get_next()
+#
+# with tf.Session() as sess:
+#     print("Initialize an iterator over a dataset with 10 elements.")
+#     # Initialize an iterator over a dataset with 10 elements.
+#     sess.run(iterator.initializer, feed_dict={max_value: 10})
+#     for i in range(10):
+#       value = sess.run(next_element)
+#       assert i == value
+#       print(i,value)
+#
+# print("Initialize the same iterator over a dataset with 100 elements.")
+# with tf.Session() as sess:
+#     # Initialize the same iterator over a dataset with 100 elements.
+#     sess.run(iterator.initializer, feed_dict={max_value: 100})
+#     for i in range(100):
+#       value = sess.run(next_element)
+#       assert i == value
+#       print(i,value)
 
-# Initialize an iterator over a dataset with 10 elements.
-sess.run(iterator.initializer, feed_dict={max_value: 10})
-for i in range(10):
-  value = sess.run(next_element)
-  assert i == value
-
-# Initialize the same iterator over a dataset with 100 elements.
-sess.run(iterator.initializer, feed_dict={max_value: 100})
-for i in range(100):
-  value = sess.run(next_element)
-  assert i == value
 
 """
 case3: reinitializable iterator
@@ -127,33 +142,34 @@ reinitializable iterator可以从多个不同的Dataset对象处初始化。
 以及一个validation input pipeline（它会在未修改过的数据上进行预测的评估）。
 这些pipeline通常使用不同的Dataset对象，但它们具有相同的结构（例如：对每个component相同的types和shapes）
 """
-# Define training and validation datasets with the same structure.
-training_dataset = tf.data.Dataset.range(100).map(
-    lambda x: x + tf.random_uniform([], -10, 10, tf.int64))
-validation_dataset = tf.data.Dataset.range(50)
-
-# A reinitializable iterator is defined by its structure. We could use the
-# `output_types` and `output_shapes` properties of either `training_dataset`
-# or `validation_dataset` here, because they are compatible.
-iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
-                                   training_dataset.output_shapes)
-next_element = iterator.get_next()
-
-training_init_op = iterator.make_initializer(training_dataset)
-validation_init_op = iterator.make_initializer(validation_dataset)
-
-# Run 20 epochs in which the training dataset is traversed, followed by the
-# validation dataset.
-for _ in range(20):
-  # Initialize an iterator over the training dataset.
-  sess.run(training_init_op)
-  for _ in range(100):
-    sess.run(next_element)
-
-  # Initialize an iterator over the validation dataset.
-  sess.run(validation_init_op)
-  for _ in range(50):
-    sess.run(next_element)
+# # Define training and validation datasets with the same structure.
+# training_dataset = tf.data.Dataset.range(100).map(lambda x: x + tf.random_uniform([], -10, 10, tf.int64))
+# validation_dataset = tf.data.Dataset.range(50)
+#
+# # A reinitializable iterator is defined by its structure. We could use the
+# # `output_types` and `output_shapes` properties of either `training_dataset`
+# # or `validation_dataset` here, because they are compatible.
+# iterator = tf.data.Iterator.from_structure(training_dataset.output_types,training_dataset.output_shapes)
+# next_element = iterator.get_next()
+#
+# training_init_op = iterator.make_initializer(training_dataset)
+# validation_init_op = iterator.make_initializer(validation_dataset)
+#
+# with tf.Session() as sess:
+#     # Run 20 epochs in which the training dataset is traversed, followed by the
+#     # validation dataset.
+#     for _ in range(2):
+#       print("Initialize an iterator over the training dataset.")
+#       # Initialize an iterator over the training dataset.
+#       sess.run(training_init_op)
+#       for _ in range(100):
+#           print(sess.run(next_element))
+#
+#       # Initialize an iterator over the validation dataset.
+#       print("Initialize an iterator over the validation dataset.")
+#       sess.run(validation_init_op)
+#       for _ in range(50):
+#         print(sess.run(next_element))
 
 """
 case4： feedable iterator
@@ -181,23 +197,25 @@ next_element = iterator.get_next()
 training_iterator = training_dataset.make_one_shot_iterator()
 validation_iterator = validation_dataset.make_initializable_iterator()
 
-# The `Iterator.string_handle()` method returns a tensor that can be evaluated
-# and used to feed the `handle` placeholder.
-training_handle = sess.run(training_iterator.string_handle())
-validation_handle = sess.run(validation_iterator.string_handle())
 
-# Loop forever, alternating between training and validation.
-while True:
-  # Run 200 steps using the training dataset. Note that the training dataset is
-  # infinite, and we resume from where we left off in the previous `while` loop
-  # iteration.
-  for _ in range(200):
-    sess.run(next_element, feed_dict={handle: training_handle})
+with tf.Session() as sess:
+    # The `Iterator.string_handle()` method returns a tensor that can be evaluated
+    # and used to feed the `handle` placeholder.
+    training_handle = sess.run(training_iterator.string_handle())
+    validation_handle = sess.run(validation_iterator.string_handle())
 
-  # Run one pass over the validation dataset.
-  sess.run(validation_iterator.initializer)
-  for _ in range(50):
-    sess.run(next_element, feed_dict={handle: validation_handle})
+    # Loop forever, alternating between training and validation.
+    while True:
+      # Run 200 steps using the training dataset. Note that the training dataset is
+      # infinite, and we resume from where we left off in the previous `while` loop
+      # iteration.
+      for _ in range(200):
+        sess.run(next_element, feed_dict={handle: training_handle})
+
+      # Run one pass over the validation dataset.
+      sess.run(validation_iterator.initializer)
+      for _ in range(50):
+        sess.run(next_element, feed_dict={handle: validation_handle})
 
 
 

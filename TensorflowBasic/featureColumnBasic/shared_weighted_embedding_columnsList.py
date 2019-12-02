@@ -15,33 +15,19 @@ from tensorflow.python.feature_column.feature_column import _LazyBuilder
 
 def shared_embedding_column_with_hash_bucket():
 
-    features = {'brands': [["410387", "415955", "412596", "416526", "416805", "408844", "418514", "411611", "415266"],
+    features = {'L1': [["410387", "415955", "412596", "416526", "416805", "408844", "418514", "411611", "415266"],
                           ["410387", "415955", "412596", "416526", "416805", "408844", "418514", "411611", "415266"]],
-                'brandWeight': [[44.0, 33.0, 17.0, 6.0, 3.0, 2.0, 1.0, 1.0, 1.0],[44.0, 33.0, 17.0, 6.0, 3.0, 2.0, 1.0, 1.0, 1.0]],
-                 'brand': [["410387"],["415955"]]
+                'LW1': [[44.0, 33.0, 17.0, 6.0, 3.0, 2.0, 1.0, 1.0, 1.0],[44.0, 33.0, 17.0, 6.0, 3.0, 2.0, 1.0, 1.0, 1.0]],
+                 'a2': [["410387"],["415955"]]
                  }
-
-
-    brandlist = tf.feature_column.categorical_column_with_hash_bucket(
-        key='brands',
-        hash_bucket_size=40,
-        dtype=tf.string
-    )
-    brands = tf.feature_column.weighted_categorical_column(brandlist, 'brandWeight')
-
-
-    brand = tf.feature_column.categorical_column_with_hash_bucket(
-        key='brand',
-        hash_bucket_size=40,
-        dtype=tf.string
-    )
-
     """
     这两个编码的映射hash_bucket_size要是统一的一个值，这里是40
     """
-
-    brand_embed = feature_column.shared_embedding_columns([brands, brand], 5, combiner='sum',shared_embedding_collection_name="brand")  # mark
-
+    brandlist = tf.feature_column.categorical_column_with_hash_bucket(key='L1',hash_bucket_size=40,dtype=tf.string)
+    brandweighteds = tf.feature_column.weighted_categorical_column(brandlist, 'LW1',dtype=tf.float32)
+    brand = tf.feature_column.categorical_column_with_hash_bucket(key='a2',hash_bucket_size=40,dtype=tf.string)
+    brand_embed = feature_column.shared_embedding_columns([brandweighteds, brand], 5, combiner='sum',shared_embedding_collection_name="brand")  # mark
+    print(brand_embed)
     color_dense_tensor = feature_column.input_layer(features,brand_embed)
 
     with tf.Session() as session:

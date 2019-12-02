@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-price = {'price': [[1.], [2.], [3.], [4.]]}
+price = {'price': [[1.], [2.], [3.], [4.],[-1.]]}
 
 column = tf.feature_column.numeric_column('price', normalizer_fn=lambda x:x+2)
 column2 = tf.feature_column.numeric_column('price', shape=(),normalizer_fn=lambda x:x+2)

@@ -33,7 +33,7 @@ print('\n矩阵')
 display(matrices)
 
 # shape of image：(806,806,3)
-img=mpimg.imread('E:\CODEING\codeingForSelfStudy\CTR_CVR_DEEPLEARNING\esmm_public_Guidebook\TensorflowBasic\TfDataDatasetInputPipline\data\YJango.jpg') # 我的头像
+img=mpimg.imread('E:\CODEING\codeingForSelfStudy\TensorflowStudy\TensorFlowCtrCvrStudyGuidebook\TensorflowBasic\TfrecordDataDatasetInputPipline\data\YJango.jpg') # 我的头像
 tensors = np.array([img,img,img])
 # show image
 print('\n张量')

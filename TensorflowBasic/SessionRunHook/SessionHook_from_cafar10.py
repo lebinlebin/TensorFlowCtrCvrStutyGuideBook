@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+import  time
 class _LoggerHook(tf.train.SessionRunHook):
   """Logs loss and runtime."""
 

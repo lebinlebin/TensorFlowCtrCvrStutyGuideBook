@@ -81,10 +81,9 @@ def my_model_fn(features,labels,mode,params):
                                    name='acc_op') #计算精度
     metrics = {'accuracy': accuracy} #返回格式
     tf.summary.scalar('accuracy', accuracy[1]) #仅为了后面图表统计使用
+    if mode == tf.estimator.ModeKeys.EVAL:
+        return tf.estimator.EstimatorSpec(mode, loss=loss, eval_metric_ops=metrics)
 
-
-      
-    
 import os
 import pandas as pd
 
@@ -144,8 +143,7 @@ def train_input_fn(features, labels, batch_size):
 
 #开始训练
 classifier.train(
-    input_fn=lambda:train_input_fn(train_x, train_y, 100),
-    steps=1000)
+    input_fn=lambda:train_input_fn(train_x, train_y, 100), steps=1000)
 
 #针对测试的喂食函数
 def eval_input_fn(features, labels, batch_size):
@@ -157,7 +155,7 @@ def eval_input_fn(features, labels, batch_size):
 
 #评估我们训练出来的模型质量
 eval_result = classifier.evaluate(
-    input_fn=lambda:eval_input_fn(test_x, test_y,batch_size))
+    input_fn=lambda:eval_input_fn(test_x, test_y, batch_size))
 
 print(eval_result)
 
@@ -178,15 +176,15 @@ for i in range(0,100):
         'PetalLength': [c],
         'PetalWidth': [d],
     }
-    
+
     #进行预测
     predictions = classifier.predict(
         input_fn=lambda:eval_input_fn(predict_x,
-                                      labels=[0,],
-                                      batch_size=batch_size))    
+                                      labels=[0,],#这个输入是啥意思？？？eval_input_fn为甚么要传入labels列表。eval和predict不同,也是有监督，要传入labels；但是predict是不需要labels的。这里传入一个列表形式的labels，只为调用eval_input_fn不报错
+                                      batch_size=batch_size))
 
     #预测结果是数组，尽管实际我们只有一个
     for pred_dict in predictions:
-        class_id = pred_dict['class_ids'][0]
+        class_id = pred_dict['class_ids'][0] #由于输出为 [[2],[1],[0],[2],...]形式，因此要再取一个pred_dict['class_ids'][0]
         probability = pred_dict['probabilities'][class_id]
         print(SPECIES[class_id],100 * probability)

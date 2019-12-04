@@ -1,5 +1,15 @@
 """
-tensorflow-gpu  bug测试
+tensorflow-gpu  bug
+这里对于windows版本的tensorflow-gpu版本对于
+tf.feature_column.indicator_column
+
+有bug。
+同时tf.one_hot()也有这个bug
+
+解决方法是放在CPU上运行
+with tf.device('/cpu:0'):
+    indicator = tf.feature_column.indicator_column(column)
+    tensor = tf.feature_column.input_layer(pets, [indicator])
 """
 import tensorflow as tf
 pets = {'pets': ['rabbit','pig','dog','mouse','cat']}

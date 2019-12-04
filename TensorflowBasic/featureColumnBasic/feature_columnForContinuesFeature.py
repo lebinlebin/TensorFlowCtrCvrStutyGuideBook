@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-<深度学习之TensorFlow工程化项目实战>配套代码 （700+页）
-"""
+
 
 import tensorflow as tf
 

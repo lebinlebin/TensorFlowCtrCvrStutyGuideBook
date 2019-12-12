@@ -2,8 +2,9 @@
 tf.add_to_collection tf.get_collection
 tf.add_to_collection–向当前计算图中添加张量集合
 tf.get_collection–返回当前计算图中手动添加的张量集合
-"""
 
+不要将大对象添加到计算图中，该计算为循环累积向图中添加节点，导致内存爆炸问题。
+"""
 #!/usr/bin/python
 # coding:utf-8
 import tensorflow as tf
@@ -17,6 +18,6 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     # 返回当前计算图中手动添加的张量集合
     v = tf.get_collection('v')
-    print (v)
-    print (v[0].eval())
-    print (v[1].eval())
+    print(v)
+    print(v[0].eval())
+    print(v[1].eval())
